@@ -15,7 +15,8 @@
 
 unsigned int sizeofULL = sizeof(unsigned long long);
 int const block_size = sizeof(unsigned long long) * 8;
-extern THCState *state;
+//extern THCState *state;
+THCState *state = at::globalContext().lazyInitCUDA();
 
 /**
  * Computes IoU of two boxes.
@@ -194,7 +195,7 @@ at::Tensor nms_cuda(const at::Tensor& boxes,
                                              .device(at::kCPU)
                                              .requires_grad(false));
 
-  std::thread threads[batch_size];
+  std::thread* threads = new std::thread[batch_size];
   for (int img_idx=0; img_idx < batch_size; img_idx++) {
     threads[img_idx] = std::thread(
       compute_nms,
@@ -207,8 +208,13 @@ at::Tensor nms_cuda(const at::Tensor& boxes,
       std::ref(iou_matrix_host));
   }
 
-  for (auto& thread: threads) {
-    thread.join();
+  for (int i = 0; i < batch_size; ++i)
+  {
+    threads[i].join();
   }
+  
+  // clear memory
+  delete [] threads;
+  
   return keep.to(boxes.device());
 }

@@ -7,7 +7,8 @@
 #include <THC/THC.h>
 #include "crop_and_resize_kernel.h"
 
-extern THCState *state;
+//extern THCState *state;
+THCState *state = at::globalContext().lazyInitCUDA();
 
 
 void crop_and_resize_gpu_forward(

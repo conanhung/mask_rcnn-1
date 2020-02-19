@@ -14,18 +14,18 @@ from mrcnn.models.components.nms import nms_wrapper  # pylint: disable=E0611
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
-NMS_INPUT = './tests/nms_input.pt'
-NMS_OUTPUT = './tests/nms_output.pt'
+NMS_INPUT = 'nms_input.pt'
+NMS_OUTPUT = 'nms_output.pt'
 PROPOSAL_COUNT = 2000
 THRESHOLD = 0.9
-DEVICE = 1
+DEVICE = 0
 
 
 def nms_test():
     logging.info('Testing NMS...')
     logging.debug('Loading golden truth input and outputs...')
-    gt_nms_in = torch.load(NMS_INPUT)
-    gt_nms_out = torch.load(NMS_OUTPUT)
+    gt_nms_in = torch.load(NMS_INPUT, map_location='cuda:0')
+    gt_nms_out = torch.load(NMS_OUTPUT, map_location='cuda:0')
 
     logging.debug('Running NMS...')
     with torch.cuda.device(DEVICE):
